@@ -6,19 +6,22 @@ var H = canvas.height = window.innerHeight-50;
 
 
 function sendRequest(endpoint, objects, callback) {
-    var body = null;
-    if (objects)
-        body = JSON.stringify(objects);
+    // var body = null;
+    // if (objects)
+    //     body = JSON.stringify(objects);
     fetch(endpoint, {
         method: "POST",
         headers:{
             'Content-Type': 'application/json',
             'Accept': 'application/json'
         },
-        body: body
+        body: JSON.stringify(objects)
     })
     .then(response => response.json())
-    .then(json => callback(json))
+    .then(json => {
+        if(callback)
+            callback(json);
+    })
     .catch(e => console.log('Error: ' + e))
 }
 
@@ -105,11 +108,8 @@ function getPosition(e) {
 
 function addEntity(entity, data) {
     world[entity] = data;
-    console.log('addEntity');
-    sendRequest('/entity/' + entity, data, newWorld => {
-        world = newWorld;
-        drawNextFrame();
-    });
+    drawNextFrame();
+    sendRequest('/entity/' + entity, data, null);
 }
 
 var counter = 0;
@@ -234,8 +234,10 @@ mouse.mousedraggers.push(function(x,y,clicked,e) {
 function update() {
     // get the world then update the frame
     sendRequest('/world', null, newWorld => {
-        world = newWorld;
-        drawNextFrame();
+        if (world !== newWorld) {
+            world = newWorld;
+            drawNextFrame();
+        }
     });
     drawFrame();
 }
