@@ -6,9 +6,6 @@ var H = canvas.height = window.innerHeight-50;
 
 
 function sendRequest(endpoint, objects, callback) {
-    // var body = null;
-    // if (objects)
-    //     body = JSON.stringify(objects);
     fetch(endpoint, {
         method: "POST",
         headers:{
@@ -28,7 +25,14 @@ function sendRequest(endpoint, objects, callback) {
 
 world = {};
 
-//XXX: TODO Make this prettier!
+function getColor(){
+    var colour = "#000000";
+    while(colour === "#000000")
+        // taken from https://stackoverflow.com/questions/1484506/random-color-generator by Mohsen
+        colour = '#'+Math.random().toString(16).substr(-6);
+    return colour;
+}
+
 function drawCircle(context,entity) {
     with(context) {
         beginPath();
@@ -40,16 +44,15 @@ function drawCircle(context,entity) {
         strokeStyle = fillStyle;
         arc(x, y, (entity["radius"])?entity["radius"]:50, 0, 2.0 * Math.PI, false);
         stroke();
+        fill();
     }
 }
 
 function prepEntity(entity) {
-    if (!entity["colour"]) {
-        entity["colour"] = "#FF0000";
-    }
-    if (!entity["radius"]) {
-        entity["radius"] = 50;
-    }
+    if (!entity["colour"])
+        entity["colour"] = getColor();
+    // entity["colour"] = getColor();
+    entity["radius"] = Math.random()*15;
     return entity;
 }
 
@@ -59,7 +62,6 @@ function clearFrame() {
     fillStyle = "#000";
     fillRect(0,0,W,H);
     }
-
 }
 
 // This actually draws the frame
@@ -105,10 +107,8 @@ function getPosition(e) {
     }
 }
 
-
 function addEntity(entity, data) {
     world[entity] = data;
-    drawNextFrame();
     sendRequest('/entity/' + entity, data, null);
 }
 
@@ -215,33 +215,28 @@ mouse = (function() {
     return self;
 })();
 
+
 // Add the application specific mouse listeners!
-//XXX: TODO Make these prettier!
 mouse.mousedowners.push(function(x,y,clicked,e) {
-    addEntityWithoutName({'x':x,'y':y,'colour':'blue'});
+    addEntityWithoutName({'x':x,'y':y,'colour':getColor()});
 });
 
 mouse.mouseuppers.push(function(x,y,clicked,e) {
-    addEntityWithoutName({'x':x,'y':y,'colour':'red'});
+    addEntityWithoutName({'x':x,'y':y,'colour':getColor()});
 });
 
 mouse.mousedraggers.push(function(x,y,clicked,e) {
-    addEntityWithoutName({'x':x,'y':y,'colour':'green',
-                          'radius':10});
+    addEntityWithoutName({'x':x,'y':y,'colour':getColor()});
 });
 
 
-function update() {
-    // get the world then update the frame
-    sendRequest('/world', null, newWorld => {
-        if (world !== newWorld) {
+async function update() {
+    await sendRequest('/world', null, newWorld => {
             world = newWorld;
             drawNextFrame();
-        }
     });
     drawFrame();
 }
 
 // 30 frames per second
 setInterval(update, 1000/30.0);
-// setInterval(update, 1000/1.0);
