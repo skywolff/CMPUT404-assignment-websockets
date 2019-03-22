@@ -95,9 +95,10 @@ def read_ws(ws,client):
     '''A greenlet function that reads from the websocket and updates the world'''
     while True:
         msg = ws.receive()
-        print("WS RECV: %s" % msg)
+        print("WS RECV: ")
         if msg:
             world = json.loads(msg)
+            print_world(world)
             myWorld = world
             send_all_json(world)
         else:
@@ -133,6 +134,10 @@ def flask_post_json():
         return json.loads(request.data.decode("utf8"))
     else:
         return json.loads(request.form.keys()[0])
+
+def print_world(world):
+    for entity in world:
+        print(entity, world[entity])
 
 @app.route("/entity/<entity>", methods=['POST','PUT'])
 def update(entity):
