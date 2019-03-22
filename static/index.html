@@ -27,7 +27,7 @@
     <canvas id="c" width="100%" height="100%" style="-webkit-tap-highlight-color: transparent;"></canvas> 
 
     <script>
-      // Fix me
+// Fix me
 var canvas = document.getElementById('c');
 var host = window.location.host;
 var context = canvas.getContext("2d");
@@ -146,7 +146,7 @@ function getPosition(e) {
 
 function addEntity(entity, data) {
     world[entity] = data;
-    sendRequest('/entity/' + entity, data, null);
+    socket.send(JSON.stringify(world));
 }
 
 var counter = 0;
@@ -267,11 +267,7 @@ mouse.mousedraggers.push(function(x,y,clicked,e) {
 });
 
 
-async function update() {
-    await sendRequest('/world', null, newWorld => {
-            world = newWorld;
-            drawNextFrame();
-    });
+function update() {
     drawFrame();
 }
 
@@ -280,16 +276,20 @@ function wsSetup() {
     socket = new WebSocket(url);
     socket.onopen = function() {
         //XXX: TODO What are you going to do here?
+        // nothing?!
     };
-    socket.onerror = function(msg) {
-        debug("WebSocket Error:" + msg.data);
+    socket.onerror = function(event) {
+        debug("WebSocket Error:" + event.data);
+        console.error("websocket error: ", event);
     };
     socket.onmessage = function(msg) {  
         try {
             debug("WebSocket Recv:" + msg.data);
-            //XXX: TODO What are you going to do here?            
+            var newWorld = JSON.parse(msg.data);
+            world = newWrold;
+            drawNextFrame();
         } catch (e) {
-            alert("socket on message: " + e);
+            console.log("socket on message: " + e);
         }
     }; 
 }

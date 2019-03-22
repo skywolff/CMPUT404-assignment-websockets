@@ -93,17 +93,15 @@ def hello():
 
 def read_ws(ws,client):
     '''A greenlet function that reads from the websocket and updates the world'''
-    try:
-        while True:
-            msg = ws.receive()
-            print("WS RECV: %s" % msg)
-            if msg:
-                packet = json.loads(msg)
-                send_all_json( packet )
-            else:
-                break
-    except:
-        '''Done'''
+    while True:
+        msg = ws.receive()
+        print("WS RECV: %s" % msg)
+        if msg:
+            world = json.loads(msg)
+            myWorld = world
+            send_all_json(world)
+        else:
+            break
 
 @sockets.route('/subscribe')
 def subscribe_socket(ws):
