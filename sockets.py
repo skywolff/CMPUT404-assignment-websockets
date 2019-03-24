@@ -46,7 +46,7 @@ class World:
         self.listeners = list()
         
     def add_set_listener(self, listener):
-        self.listeners.append( listener )
+        self.listeners.append(listener)
 
     def update(self, entity, key, value):
         entry = self.space.get(entity,dict())
@@ -74,44 +74,15 @@ class World:
 
 myWorld = World()        
 
-def set_listener( entity, data ):
+def set_listener(entity, data):
     ''' do something with the update ! '''
 
-myWorld.add_set_listener( set_listener )
+myWorld.add_set_listener(set_listener)
         
 @app.route('/')
 def hello():
     '''Return something coherent here.. perhaps redirect to /static/index.html '''
     return redirect(url_for('static',filename='index.html'))
-
-
-# @app.route("/entity/<entity>", methods=['POST','PUT'])
-# def update(entity):
-#     '''update the entities via this interface'''
-#     json = flask_post_json()
-#     # myWorld.set(entity, json)
-#     for k,v in json.items():
-#         myWorld.update(entity, k, v)
-#     return flask.json.jsonify(json)
-
-
-# @app.route("/world", methods=['POST','GET'])    
-# def world():
-#     '''you should probably return the world here'''
-#     return jsonify(myWorld.world())
-
-
-# @app.route("/entity/<entity>")    
-# def get_entity(entity):
-#     '''This is the GET version of the entity interface, return a representation of the entity'''
-#     return jsonify(myWorld.get(entity))
-
-
-# @app.route("/clear", methods=['POST','GET'])
-# def clear():
-#     '''Clear the world out!'''
-#     myWorld.clear()
-#     return jsonify(myWorld.world())
 
 
 @sockets.route('/subscribe')
